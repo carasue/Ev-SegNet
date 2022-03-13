@@ -2,14 +2,17 @@ from __future__ import print_function
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.utils import to_categorical
+# from tensorflow.keras.utils import to_categorical
 import glob
 import cv2
 from augmenters import get_augmenter
+from PIL import Image
 
 np.random.seed(7)
 problemTypes = ['classification', 'segmentation']
 
+def to_categorical(y, num_classes):
+    return np.eye(num_classes, dtype='uint8')[y]
 
 class Loader:
     def __init__(self, dataFolderPath, width=224, height=224, channels=3, n_classes=21, problemType='segmentation',
@@ -231,8 +234,12 @@ class Loader:
                 img = cv2.imread(random_images[index], 0)
             else:
                 # img = cv2.imread(random_images[index])
-                img = tf.keras.preprocessing.image.load_img(random_images[index])
-                img = tf.keras.preprocessing.image.img_to_array(img)
+                # img = tf.keras.preprocessing.image.load_img(random_images[index])
+                # img = tf.keras.preprocessing.image.img_to_array(img)
+
+                # https://stackoverflow.com/questions/50746096/how-to-match-cv2-imread-to-the-keras-image-img-load-output
+                img = cv2.imread(random_images[index])
+                img = img[...,::-1]
 
             label = cv2.imread(random_labels[index], 0)
             if events:
